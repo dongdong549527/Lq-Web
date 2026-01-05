@@ -1,0 +1,156 @@
+<script setup lang="ts">
+import { ref, onMounted, reactive } from 'vue'
+import request from '@/api/request'
+import { ElMessage, ElMessageBox } from 'element-plus'
+
+interface Depot {
+  id: number
+  name: string
+  location: string
+}
+
+const depots = ref<Depot[]>([])
+const dialogVisible = ref(false)
+const isEdit = ref(false)
+const formRef = ref()
+
+const form = reactive({
+  id: 0,
+  name: '',
+  location: ''
+})
+
+const rules = {
+  name: [{ required: true, message: '请输入粮库名称', trigger: 'blur' }]
+}
+
+const fetchDepots = async () => {
+  try {
+    const res = await request.get('/depots')
+    depots.value = res as unknown as Depot[]
+  } catch (error) {
+    ElMessage.error('获取粮库列表失败')
+  }
+}
+
+const handleAdd = () => {
+  isEdit.value = false
+  form.id = 0
+  form.name = ''
+  form.location = ''
+  dialogVisible.value = true
+}
+
+const handleEdit = (row: Depot) => {
+  isEdit.value = true
+  form.id = row.id
+  form.name = row.name
+  form.location = row.location
+  dialogVisible.value = true
+}
+
+const handleDelete = (row: Depot) => {
+  ElMessageBox.confirm('确定要删除该粮库吗?', '警告', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning',
+  }).then(async () => {
+    try {
+      await request.delete(`/depots/${row.id}`)
+      ElMessage.success('删除成功')
+      fetchDepots()
+    } catch (error) {
+      ElMessage.error('删除失败')
+    }
+  })
+}
+
+const submitForm = async () => {
+  if (!formRef.value) return
+  await formRef.value.validate(async (valid: boolean) => {
+    if (valid) {
+      try {
+        if (isEdit.value) {
+          await request.put(`/depots/${form.id}`, form)
+          ElMessage.success('更新成功')
+        } else {
+          await request.post('/depots', form)
+          ElMessage.success('创建成功')
+        }
+        dialogVisible.value = false
+        fetchDepots()
+      } catch (error) {
+        ElMessage.error('操作失败')
+      }
+    }
+  })
+}
+
+onMounted(() => {
+  fetchDepots()
+})
+</script>
+
+<template>
+  <el-card class="box-card">
+    <template #header>
+      <div class="card-header">
+        <span class="title">粮库管理</span>
+        <el-button type="primary" @click="handleAdd">
+            <el-icon class="el-icon--left"><Plus /></el-icon>
+            新增粮库
+        </el-button>
+      </div>
+    </template>
+
+    <el-table :data="depots" stripe style="width: 100%">
+      <el-table-column prop="id" label="ID" width="80" align="center" />
+      <el-table-column prop="name" label="粮库名称" />
+      <el-table-column prop="location" label="地理位置" />
+      <el-table-column label="操作" width="180" align="center">
+        <template #default="scope">
+          <el-button size="small" type="primary" plain @click="handleEdit(scope.row)">编辑</el-button>
+          <el-button size="small" type="danger" plain @click="handleDelete(scope.row)">删除</el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+
+    <el-dialog
+      v-model="dialogVisible"
+      :title="isEdit ? '编辑粮库' : '新增粮库'"
+      width="30%"
+      destroy-on-close
+    >
+      <el-form :model="form" :rules="rules" ref="formRef" label-width="100px" status-icon>
+        <el-form-item label="粮库名称" prop="name">
+          <el-input v-model="form.name" placeholder="请输入粮库名称" />
+        </el-form-item>
+        <el-form-item label="地理位置" prop="location">
+          <el-input v-model="form.location" placeholder="请输入地理位置" />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="dialogVisible = false">取消</el-button>
+          <el-button type="primary" @click="submitForm">确定</el-button>
+        </span>
+      </template>
+    </el-dialog>
+  </el-card>
+</template>
+
+<style scoped>
+.box-card {
+    margin: 20px;
+}
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.title {
+    font-size: 18px;
+    font-weight: bold;
+    color: var(--el-text-color-primary);
+}
+</style>
