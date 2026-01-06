@@ -2,6 +2,7 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
+from app.core.security import verify_password, get_password_hash
 from app.core.db import get_db
 from app.models import User
 from app.schemas import UserCreate, UserResponse
@@ -22,8 +23,8 @@ async def create_user(user: UserCreate, db: AsyncSession = Depends(get_db)):
     if existing_user:
         raise HTTPException(status_code=400, detail="Username or email already registered")
     
-    # Simple hash (In production, use Passlib)
-    hashed_password = user.password + "notsecure" 
+    # Secure hash using Passlib
+    hashed_password = get_password_hash(user.password) 
     
     db_user = User(
         username=user.username,

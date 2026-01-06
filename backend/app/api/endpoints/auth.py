@@ -17,11 +17,20 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
     result = await db.execute(select(User).where(User.username == form_data.username))
     user = result.scalars().first()
     
-    if not user or not verify_password(form_data.password, user.hashed_password):
+    # Check if user exists and password is correct (Standard check)
+    is_password_valid = False
+    if user:
+        try:
+            is_password_valid = verify_password(form_data.password, user.hashed_password)
+        except Exception:
+            # Ignore verification errors (like UnknownHashError) to allow fallback check
+            pass
+
+    if not user or not is_password_valid:
         # Fallback for simple hash (from old users created before bcrypt)
         # In production, you might want to migrate old passwords or force reset
         if not user or user.hashed_password != form_data.password + "notsecure":
-             raise HTTPException(
+            raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Incorrect username or password",
                 headers={"WWW-Authenticate": "Bearer"},

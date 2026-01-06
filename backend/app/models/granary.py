@@ -12,8 +12,10 @@ class Granary(Base):
     current_stock = Column(Float, default=0.0)
 
     # Relationships
-    depot = relationship("Depot", back_populates="granaries")
+    # One-to-One with GranaryConfig
     config = relationship("GranaryConfig", uselist=False, back_populates="granary", cascade="all, delete-orphan")
+    # Many-to-One with Depot
+    depot = relationship("Depot", back_populates="granaries")
 
 class GranaryConfig(Base):
     __tablename__ = "granary_configs"
