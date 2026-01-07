@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.db import engine, Base
-from app.models import User, Depot, Granary, GranaryConfig # Import to register models
+from app.models import User, Depot, Granary, GranaryConfig, GranaryInfo, GranaryData # Import to register models
 from app.api.endpoints import users, depots, granaries, auth
 
 app = FastAPI(title="Grain Management System")

@@ -1,0 +1,91 @@
+Table "粮库" [headercolor: #175e7a] {
+	id integer [ pk, increment, not null, unique ]
+	"粮库名称" char(1)
+	"粮库地址" text
+	"联系人" char(1)
+	"电话" integer
+	"省份" char(1)
+	"安装时间" timestamp
+}
+
+Table "粮仓" [headercolor: #175e7a] {
+	id integer [ pk, increment, not null, unique ]
+	"粮库ID" integer
+	"粮仓名称" char(1)
+	"最后采集时间" timestamp
+	"采集状态" integer
+}
+
+Table "粮仓配置" [headercolor: #175e7a] {
+	id integer [ pk, increment, not null, unique ]
+	"粮仓ID" integer
+	"分机号" integer
+	"温度采集器数量" integer
+	"温湿度采集器数量" integer
+	"起始编号" integer
+	"结束编号" integer
+	"温湿度编号" integer
+	"电缆根数" integer
+	"电缆点数" integer
+	"采集器总数" integer
+	"mqtt接收主题" char(1)
+	"mqtt发送主题" char(1)
+	"采集设备" integer
+}
+
+Table "粮仓数据" [headercolor: #175e7a] {
+	id integer [ pk, increment, not null, unique ]
+	"粮仓ID" integer
+	"采集时间" timestamp
+	"编号" integer
+	"温度值" json
+	"温湿度值" integer
+}
+
+Table "用户" [headercolor: #175e7a] {
+	id integer [ pk, increment, not null, unique ]
+	"用户名" char(1)
+	"密码" char(1)
+	"邮箱" char(1)
+	"权限" integer
+	"粮库ID" integer
+	"姓名" text
+	"联系电话" integer
+	"是否使用" integer
+}
+
+Table "粮仓信息" [headercolor: #175e7a] {
+	id integer [ pk, increment, not null, unique ]
+	"粮仓ID" integer
+	"仓管员" char(1)
+	"设计储量" integer
+	"实际储量" integer
+	"存储性质" char(1)
+	"品种" char(1)
+	"入仓时间" timestamp
+	"产地" char(1)
+	"粮食等级" char(1)
+	"出糙率（容重）" integer
+	"水分" integer
+	"备注" text
+}
+
+Ref "fk_粮库_id_粮仓" {
+	"粮库".id < "粮仓"."粮库ID" [ delete: no action, update: no action ]
+}
+
+Ref "fk_粮仓_id_粮仓配置" {
+	"粮仓".id < "粮仓配置"."粮仓ID" [ delete: no action, update: no action ]
+}
+
+Ref "fk_粮仓_id_粮仓数据" {
+	"粮仓".id < "粮仓数据"."粮仓ID" [ delete: no action, update: no action ]
+}
+
+Ref "fk_粮仓_id_粮仓信息" {
+	"粮仓".id < "粮仓信息"."粮仓ID" [ delete: no action, update: no action ]
+}
+
+Ref "fk_粮库_id_用户" {
+	"粮库".id < "用户"."粮库ID" [ delete: no action, update: no action ]
+}

@@ -6,7 +6,11 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 interface Depot {
   id: number
   name: string
-  location: string
+  address: string
+  contact_person: string
+  phone: string
+  province: string
+  created_at: string
 }
 
 const depots = ref<Depot[]>([])
@@ -17,7 +21,10 @@ const formRef = ref()
 const form = reactive({
   id: 0,
   name: '',
-  location: ''
+  address: '',
+  contact_person: '',
+  phone: '',
+  province: ''
 })
 
 const rules = {
@@ -37,7 +44,10 @@ const handleAdd = () => {
   isEdit.value = false
   form.id = 0
   form.name = ''
-  form.location = ''
+  form.address = ''
+  form.contact_person = ''
+  form.phone = ''
+  form.province = ''
   dialogVisible.value = true
 }
 
@@ -45,7 +55,10 @@ const handleEdit = (row: Depot) => {
   isEdit.value = true
   form.id = row.id
   form.name = row.name
-  form.location = row.location
+  form.address = row.address
+  form.contact_person = row.contact_person
+  form.phone = row.phone
+  form.province = row.province
   dialogVisible.value = true
 }
 
@@ -106,7 +119,15 @@ onMounted(() => {
     <el-table :data="depots" stripe style="width: 100%">
       <el-table-column prop="id" label="ID" width="80" align="center" />
       <el-table-column prop="name" label="粮库名称" />
-      <el-table-column prop="location" label="地理位置" />
+      <el-table-column prop="province" label="省份" width="100" />
+      <el-table-column prop="address" label="粮库地址" show-overflow-tooltip />
+      <el-table-column prop="contact_person" label="联系人" width="120" />
+      <el-table-column prop="phone" label="电话" width="150" />
+      <el-table-column prop="created_at" label="创建时间" width="180">
+          <template #default="scope">
+              {{ new Date(scope.row.created_at).toLocaleString() }}
+          </template>
+      </el-table-column>
       <el-table-column label="操作" width="180" align="center">
         <template #default="scope">
           <el-button size="small" type="primary" plain @click="handleEdit(scope.row)">编辑</el-button>
@@ -118,16 +139,31 @@ onMounted(() => {
     <el-dialog
       v-model="dialogVisible"
       :title="isEdit ? '编辑粮库' : '新增粮库'"
-      width="30%"
+      width="40%"
       destroy-on-close
     >
       <el-form :model="form" :rules="rules" ref="formRef" label-width="100px" status-icon>
         <el-form-item label="粮库名称" prop="name">
           <el-input v-model="form.name" placeholder="请输入粮库名称" />
         </el-form-item>
-        <el-form-item label="地理位置" prop="location">
-          <el-input v-model="form.location" placeholder="请输入地理位置" />
+        <el-form-item label="省份" prop="province">
+          <el-input v-model="form.province" placeholder="请输入省份" />
         </el-form-item>
+        <el-form-item label="粮库地址" prop="address">
+          <el-input v-model="form.address" placeholder="请输入详细地址" />
+        </el-form-item>
+        <el-row :gutter="20">
+            <el-col :span="12">
+                <el-form-item label="联系人" prop="contact_person">
+                  <el-input v-model="form.contact_person" placeholder="请输入联系人" />
+                </el-form-item>
+            </el-col>
+            <el-col :span="12">
+                <el-form-item label="电话" prop="phone">
+                  <el-input v-model="form.phone" placeholder="请输入联系电话" />
+                </el-form-item>
+            </el-col>
+        </el-row>
       </el-form>
       <template #footer>
         <span class="dialog-footer">

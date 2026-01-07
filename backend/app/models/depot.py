@@ -1,22 +1,19 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Table
+from sqlalchemy import Column, Integer, String, DateTime, Text
 from sqlalchemy.orm import relationship
 from app.core.db import Base
-
-# Association Table for Many-to-Many Relationship between User and Depot
-user_depot_association = Table(
-    "user_depot_association",
-    Base.metadata,
-    Column("user_id", Integer, ForeignKey("users.id"), primary_key=True),
-    Column("depot_id", Integer, ForeignKey("depots.id"), primary_key=True),
-)
+from datetime import datetime
 
 class Depot(Base):
     __tablename__ = "depots"
 
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, index=True, nullable=False)
-    location = Column(String, nullable=True)
+    name = Column(String, index=True, nullable=False, comment="粮库名称")
+    address = Column(Text, nullable=True, comment="粮库地址")
+    contact_person = Column(String, nullable=True, comment="联系人")
+    phone = Column(String, nullable=True, comment="电话")
+    province = Column(String, nullable=True, comment="省份")
+    created_at = Column(DateTime, default=datetime.utcnow, comment="安装时间")
 
     # Relationships
-    managers = relationship("User", secondary=user_depot_association, back_populates="depots")
     granaries = relationship("Granary", back_populates="depot", cascade="all, delete-orphan")
+    users = relationship("User", back_populates="depot")

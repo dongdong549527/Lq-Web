@@ -53,6 +53,11 @@ async def update_user(user_id: int, user_in: UserCreate, db: AsyncSession = Depe
     
     user.username = user_in.username
     user.email = user_in.email
+    user.full_name = user_in.full_name
+    user.phone = user_in.phone
+    user.role = user_in.role
+    user.depot_id = user_in.depot_id
+    user.is_active = user_in.is_active
     # Update password if needed
     
     await db.commit()

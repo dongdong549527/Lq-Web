@@ -4,7 +4,7 @@ import router from '@/router';
 import { ElMessage } from 'element-plus';
 
 const service = axios.create({
-  baseURL: 'http://127.0.0.1:8000/api',
+  baseURL: 'http://127.0.0.1:8010/api',
   timeout: 5000,
 });
 

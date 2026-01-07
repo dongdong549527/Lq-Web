@@ -39,7 +39,10 @@ async def update_depot(depot_id: int, depot_in: DepotCreate, db: AsyncSession = 
         raise HTTPException(status_code=404, detail="Depot not found")
     
     depot.name = depot_in.name
-    depot.location = depot_in.location
+    depot.address = depot_in.address
+    depot.contact_person = depot_in.contact_person
+    depot.phone = depot_in.phone
+    depot.province = depot_in.province
     
     await db.commit()
     await db.refresh(depot)
