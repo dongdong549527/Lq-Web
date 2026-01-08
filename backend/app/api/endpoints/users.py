@@ -9,13 +9,13 @@ from app.schemas import UserCreate, UserResponse
 
 router = APIRouter()
 
-@router.get("/", response_model=List[UserResponse])
+@router.get("", response_model=List[UserResponse])
 async def read_users(skip: int = 0, limit: int = 100, db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(User).offset(skip).limit(limit))
     users = result.scalars().all()
     return users
 
-@router.post("/", response_model=UserResponse)
+@router.post("", response_model=UserResponse)
 async def create_user(user: UserCreate, db: AsyncSession = Depends(get_db)):
     # Check if user exists
     result = await db.execute(select(User).where((User.username == user.username) | (User.email == user.email)))

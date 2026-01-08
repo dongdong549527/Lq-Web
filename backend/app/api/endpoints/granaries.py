@@ -9,7 +9,7 @@ from app.schemas import GranaryCreate, GranaryResponse, GranaryConfigCreate
 
 router = APIRouter()
 
-@router.get("/", response_model=List[GranaryResponse])
+@router.get("", response_model=List[GranaryResponse])
 async def read_granaries(skip: int = 0, limit: int = 100, db: AsyncSession = Depends(get_db)):
     # Load config and info eagerly
     result = await db.execute(
@@ -20,7 +20,7 @@ async def read_granaries(skip: int = 0, limit: int = 100, db: AsyncSession = Dep
     granaries = result.scalars().all()
     return granaries
 
-@router.post("/", response_model=GranaryResponse)
+@router.post("", response_model=GranaryResponse)
 async def create_granary(granary_in: GranaryCreate, db: AsyncSession = Depends(get_db)):
     # Extract nested data
     config_data = granary_in.config

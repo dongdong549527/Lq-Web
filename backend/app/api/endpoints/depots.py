@@ -9,13 +9,13 @@ from app.schemas import DepotCreate, DepotResponse
 
 router = APIRouter()
 
-@router.get("/", response_model=List[DepotResponse])
+@router.get("", response_model=List[DepotResponse])
 async def read_depots(skip: int = 0, limit: int = 100, db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(Depot).offset(skip).limit(limit))
     depots = result.scalars().all()
     return depots
 
-@router.post("/", response_model=DepotResponse)
+@router.post("", response_model=DepotResponse)
 async def create_depot(depot: DepotCreate, db: AsyncSession = Depends(get_db)):
     db_depot = Depot(**depot.dict())
     db.add(db_depot)
